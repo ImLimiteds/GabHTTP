@@ -6,6 +6,8 @@
 
 #ifdef _WIN32
 #include <windows.h>
+#else
+#include <sys/types.h>
 #endif
 
 
@@ -98,7 +100,12 @@ namespace GabHttp {
     char client_ip[INET_ADDRSTRLEN];
     inet_ntop(AF_INET, & client_addr.sin_addr, client_ip, INET_ADDRSTRLEN);
 
-    SSIZE_T bytes_read = recv(client_socket, buffer.data(), buffer.size() - 1, 0);
+    #ifdef _WIN32
+    int bytes_read = recv(client_socket, buffer.data(), buffer.size() -1 , 0);
+    #else
+    ssize_t bytes_read = recv(client_socket, buffer.data(), buffer.size() - 1, 0);
+    #endif
+    
     if (bytes_read <= 0) {
       #ifdef _WIN32
       closesocket(static_cast < SOCKET > (client_socket));
