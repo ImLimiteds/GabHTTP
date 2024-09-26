@@ -64,4 +64,5 @@ on Windows 11 23H2**
 
 Version: **1.0.0**
 
-![CI](https://github.com/ImLimiteds/GabHTTP/actions/workflows/ci.yml/badge.svg)
+![Linux](https://github.com/ImLimiteds/GabHTTP/actions/workflows/linux.yml/badge.svg)
+![Windows](https://github.com/ImLimiteds/GabHTTP/actions/workflows/windows.yml/badge.svg)

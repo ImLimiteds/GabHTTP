@@ -4,6 +4,8 @@
 
 #include <cstring>
 
+#include <windows.h>
+
 
 namespace GabHttp {
   Request::Request(const std::string & raw_request) {
@@ -94,7 +96,7 @@ namespace GabHttp {
     char client_ip[INET_ADDRSTRLEN];
     inet_ntop(AF_INET, & client_addr.sin_addr, client_ip, INET_ADDRSTRLEN);
 
-    ssize_t bytes_read = recv(client_socket, buffer.data(), buffer.size() - 1, 0);
+    SSIZE_T bytes_read = recv(client_socket, buffer.data(), buffer.size() - 1, 0);
     if (bytes_read <= 0) {
       #ifdef _WIN32
       closesocket(static_cast < SOCKET > (client_socket));
