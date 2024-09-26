@@ -63,3 +63,5 @@ int main() {
 on Windows 11 23H2**
 
 Version: **1.0.0**
+
+![CI](https://github.com/ImLimiteds/GabHTTP/actions/workflows/ci.yml/badge.svg)
