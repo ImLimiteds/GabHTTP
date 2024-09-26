@@ -43,6 +43,10 @@ namespace GabHttp {
         void set_body(const std::string& content) { body = content; }
         void set_header(const std::string& key, const std::string& value) { headers[key] = value; }
         std::string to_string() const;
+
+        int get_status_code() const {
+            return status_code;
+        }
     };
 
     class Server {

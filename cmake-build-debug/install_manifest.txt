@@ -1,6 +1,0 @@
-C:/Users/turtl/Documents/Programming/CPP/GabHTTP/cmake-build-debug/_CPack_Packages/win64/ZIP/GabHTTP-1.0-win64/lib/libGabHTTP.a
-C:/Users/turtl/Documents/Programming/CPP/GabHTTP/cmake-build-debug/_CPack_Packages/win64/ZIP/GabHTTP-1.0-win64/include/GabHttp.hpp
-C:/Users/turtl/Documents/Programming/CPP/GabHTTP/cmake-build-debug/_CPack_Packages/win64/ZIP/GabHTTP-1.0-win64/lib/cmake/GabHTTP/GabHTTPTargets.cmake
-C:/Users/turtl/Documents/Programming/CPP/GabHTTP/cmake-build-debug/_CPack_Packages/win64/ZIP/GabHTTP-1.0-win64/lib/cmake/GabHTTP/GabHTTPTargets-debug.cmake
-C:/Users/turtl/Documents/Programming/CPP/GabHTTP/cmake-build-debug/_CPack_Packages/win64/ZIP/GabHTTP-1.0-win64/lib/cmake/GabHTTP/GabHTTPConfig.cmake
-C:/Users/turtl/Documents/Programming/CPP/GabHTTP/cmake-build-debug/_CPack_Packages/win64/ZIP/GabHTTP-1.0-win64/lib/cmake/GabHTTP/GabHTTPConfigVersion.cmake

@@ -66,6 +66,8 @@ namespace GabHttp {
     if (listen(server_socket, 10) < 0) {
       throw std::runtime_error("Failed to listen on socket");
     }
+
+    std::cout << "Server listening on port " << port << std::endl;
   }
 
   Server::~Server() {
@@ -85,6 +87,12 @@ namespace GabHttp {
 
   void Server::handle_client(int client_socket) {
     std::array < char, 4096 > buffer {};
+
+    sockaddr_in client_addr;
+    socklen_t client_addr_len = sizeof(client_addr);
+    getpeername(client_socket, reinterpret_cast < sockaddr * > ( & client_addr), & client_addr_len);
+    char client_ip[INET_ADDRSTRLEN];
+    inet_ntop(AF_INET, & client_addr.sin_addr, client_ip, INET_ADDRSTRLEN);
 
     ssize_t bytes_read = recv(client_socket, buffer.data(), buffer.size() - 1, 0);
     if (bytes_read <= 0) {
@@ -109,6 +117,11 @@ namespace GabHttp {
 
     std::string response_str = res.to_string();
     send(client_socket, response_str.c_str(), response_str.size(), 0);
+    std::time_t now = std::time(nullptr);
+    char time[100];
+    std::strftime(time, sizeof(time), "%m/%d/%Y, %H:%M:%S", std::localtime( & now));
+
+    std::cout << "[" << time << "] - " << client_ip << " - " << req.method << " " << req.path << " -> " << res.get_status_code() << std::endl;
 
     #ifdef _WIN32
     closesocket(static_cast < SOCKET > (client_socket));

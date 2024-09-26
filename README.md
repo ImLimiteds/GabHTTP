@@ -59,6 +59,7 @@ int main() {
 }
 ```
 
-**GabHTTP is still in development and is not yet ready for production use.**
+**GabHTTP is still in development and is not yet ready for production use. Please note that GabHTTP has only been tested
+on Windows 11 23H2**
 
 Version: **1.0.0**
