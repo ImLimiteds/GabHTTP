@@ -1,8 +1,10 @@
 #include "../include/GabHttp.hpp"
 
 #include <sstream>
-
 #include <cstring>
+#include <algorithm>
+#include <cctype>
+#include <locale>
 
 #ifdef _WIN32
 #include <windows.h>
@@ -10,8 +12,25 @@
 #include <sys/types.h>
 #endif
 
-
 namespace GabHttp {
+  std::string to_lower(const std::string& str) {
+    std::string lower_str = str;
+    std::transform(lower_str.begin(), lower_str.end(), lower_str.begin(), [](unsigned char c) { return std::tolower(c); });
+    return lower_str;
+  }
+
+  std::string trim(const std::string& str) {
+    auto start = str.begin();
+    while (start != str.end() && std::isspace(*start)) {
+      start++;
+    }
+    auto end = str.end();
+    do {
+      end--;
+    } while (std::distance(start, end) > 0 && std::isspace(*end));
+      return std::string(start, end + 1);
+  }
+
   Request::Request(const std::string & raw_request) {
     std::istringstream request_stream(raw_request);
     std::string line;
@@ -86,60 +105,84 @@ namespace GabHttp {
     #endif
   }
 
-  void Server::route(const std::string & path,
-    const std:: function < void(Request & , Response & ) > & handler) {
-    routes[path] = handler;
+  void Server::Route(const std::string& method, const std::string& path, const std::function<void(Request&, Response&)>& handler, const std::map<std::string, std::string>& required_headers) {
+    std::string method_upper = method;
+    std::transform(method_upper.begin(), method_upper.end(), method_upper.begin(), ::toupper);
+    routes[method_upper][path] = {handler, required_headers};
   }
 
   void Server::handle_client(int client_socket) {
-    std::array < char, 4096 > buffer {};
+    std::array<char, 4096> buffer{};
 
     sockaddr_in client_addr;
     socklen_t client_addr_len = sizeof(client_addr);
-    getpeername(client_socket, reinterpret_cast < sockaddr * > ( & client_addr), & client_addr_len);
+    getpeername(client_socket, reinterpret_cast<sockaddr*>(&client_addr), &client_addr_len);
     char client_ip[INET_ADDRSTRLEN];
-    inet_ntop(AF_INET, & client_addr.sin_addr, client_ip, INET_ADDRSTRLEN);
+    inet_ntop(AF_INET, &client_addr.sin_addr, client_ip, INET_ADDRSTRLEN);
 
     #ifdef _WIN32
-    int bytes_read = recv(client_socket, buffer.data(), buffer.size() -1 , 0);
+    int bytes_read = recv(client_socket, buffer.data(), buffer.size() - 1, 0);
     #else
     ssize_t bytes_read = recv(client_socket, buffer.data(), buffer.size() - 1, 0);
     #endif
-    
+
     if (bytes_read <= 0) {
-      #ifdef _WIN32
-      closesocket(static_cast < SOCKET > (client_socket));
-      #else
-      close(client_socket);
-      #endif
-      return;
+        #ifdef _WIN32
+        closesocket(static_cast<SOCKET>(client_socket));
+        #else
+        close(client_socket);
+        #endif
+        return;
     }
 
     Request req(buffer.data());
     Response res;
 
-    auto route_it = routes.find(req.path);
-    if (route_it != routes.end()) {
-      route_it -> second(req, res);
+    auto method_it = routes.find(req.method);
+    if (method_it != routes.end()) {
+        auto route_it = method_it->second.find(req.path);
+        if (route_it != method_it->second.end()) {
+            const auto& [handler, required_headers] = route_it->second;
+
+            bool headers_valid = true;
+            for (const auto& [key, value] : required_headers) {
+                auto header_it = req.headers.find(key);
+                if (header_it == req.headers.end() || trim(to_lower(header_it->second)) != trim(to_lower(value))) {
+                    headers_valid = false;
+                    break;
+                }
+            }
+
+            if (!headers_valid) {
+                res = Response(401);
+                res.set_body("401 Unauthorized");
+                res.set_header("Content-Type", "text/plain");
+            } else {
+                handler(req, res);
+            }
+        } else {
+            res = Response(404);
+            res.set_body("404 Not Found");
+        }
     } else {
-      res = Response(404);
-      res.set_body("404 Not Found");
+        res = Response(405);
+        res.set_body("405 Method Not Allowed");
     }
 
     std::string response_str = res.to_string();
     send(client_socket, response_str.c_str(), response_str.size(), 0);
     std::time_t now = std::time(nullptr);
     char time[100];
-    std::strftime(time, sizeof(time), "%m/%d/%Y, %H:%M:%S", std::localtime( & now));
+    std::strftime(time, sizeof(time), "%m/%d/%Y, %H:%M:%S", std::localtime(&now));
 
     std::cout << "[" << time << "] - " << client_ip << " - " << req.method << " " << req.path << " -> " << res.get_status_code() << std::endl;
 
     #ifdef _WIN32
-    closesocket(static_cast < SOCKET > (client_socket));
+    closesocket(static_cast<SOCKET>(client_socket));
     #else
     close(client_socket);
     #endif
-  }
+}
 
   void Server::start_worker() {
     while (running) {

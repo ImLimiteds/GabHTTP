@@ -53,7 +53,7 @@ namespace GabHttp {
     private:
         int port;
         int server_socket;
-        std::map<std::string, std::function<void(Request&, Response&)>> routes;
+        std::map<std::string, std::map<std::string, std::pair<std::function<void(Request&, Response&)>, std::map<std::string, std::string>>>> routes;
         std::vector<std::thread> workers;
         std::mutex client_mutex;
         std::atomic<bool> running;
@@ -64,7 +64,7 @@ namespace GabHttp {
     public:
         Server(int port);
         ~Server();
-        void route(const std::string& path, const std::function<void(Request&, Response&)>& handler);
+        void Route(const std::string& method, const std::string& path, const std::function<void(Request&, Response&)>& handler, const std::map<std::string, std::string>& required_headers = {});
         void start();
         void stop();
     };

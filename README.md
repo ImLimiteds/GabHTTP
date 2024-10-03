@@ -42,19 +42,38 @@ GabHTTP is a simple HTTP server library written in C++.
 
 ## Usage
 
-Here is a simple example of how to use the GabHTTP library:
+Here are two simple examples of how to use GabHTTP:
 
 ```cpp
 #include "GabHttp.hpp"
 
 int main() {
-    GabHttp::Server server(8000);
+   GabHttp:Server Gab(8000);
+   
+   Gab.Route("GET", "/", [](GabHttp::Request req, GabHttp::Response res) {
+      res.set_body("Hello, World!");
+      res.set_header("Content-Type", "text/plain");
+   });
+   
+   Gab.Start()
+   return 0;
+}
+```
 
-    server.route("/", [](GabHttp::Request& req, GabHttp::Response& res) {
-        res.set_body("Hello, world!");
-    });
+With Headers
 
-    server.start();
+```cpp
+#include "GabHttp.hpp"
+
+int main() {
+   GabHttp::Server Gab(8000);
+   
+   Gab.Route("GET", "/", [](GabHttp::Request req, GabHttp::Response res) {
+      res.set_body("Hello, World!");
+      res.set_header("Content-Type", "text/plain");
+   }, {{"Authorization", "1234"}});
+   
+   Gab.Start()
     return 0;
 }
 ```
