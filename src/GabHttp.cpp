@@ -15,7 +15,7 @@
 namespace GabHttp {
   std::string to_lower(const std::string& str) {
     std::string lower_str = str;
-    std::transform(lower_str.begin(), lower_str.end(), lower_str.begin(), [](unsigned char c) { return std::tolower(c); });
+    std::ranges::transform(lower_str.begin(), lower_str.end(), lower_str.begin(), [](unsigned char c) { return std::tolower(c); });
     return lower_str;
   }
 
@@ -96,7 +96,7 @@ namespace GabHttp {
   }
 
   Server::~Server() {
-    stop();
+    Stop();
     #ifdef _WIN32
     closesocket(static_cast < SOCKET > (server_socket));
     WSACleanup();
@@ -107,7 +107,7 @@ namespace GabHttp {
 
   void Server::Route(const std::string& method, const std::string& path, const std::function<void(Request&, Response&)>& handler, const std::map<std::string, std::string>& required_headers) {
     std::string method_upper = method;
-    std::transform(method_upper.begin(), method_upper.end(), method_upper.begin(), ::toupper);
+    std::ranges::transform(method_upper.begin(), method_upper.end(), method_upper.begin(), ::toupper);
     routes[method_upper][path] = {handler, required_headers};
   }
 
@@ -173,7 +173,7 @@ namespace GabHttp {
     send(client_socket, response_str.c_str(), response_str.size(), 0);
     std::time_t now = std::time(nullptr);
     char time[100];
-    std::strftime(time, sizeof(time), "%m/%d/%Y, %H:%M:%S", std::localtime(&now));
+    std::strftime(time, sizeof(time), "%d/%m/%Y, %H:%M:%S", std::localtime(&now));
 
     std::cout << "[" << time << "] - " << client_ip << " - " << req.method << " " << req.path << " -> " << res.get_status_code() << std::endl;
 
@@ -199,7 +199,7 @@ namespace GabHttp {
     }
   }
 
-  void Server::start() {
+  void Server::Start() {
     running = true;
     unsigned int thread_count = std::thread::hardware_concurrency();
     workers.reserve(thread_count);
@@ -211,7 +211,7 @@ namespace GabHttp {
     }
   }
 
-  void Server::stop() {
+  void Server::Stop() {
     running = false;
     #ifdef _WIN32
     closesocket(static_cast < SOCKET > (server_socket));

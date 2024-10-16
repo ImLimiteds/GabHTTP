@@ -78,10 +78,7 @@ int main() {
 }
 ```
 
-**GabHTTP is still in development and is not yet ready for production use. Please note that GabHTTP has only been tested
-on Windows 11 23H2**
-
-Version: **1.1.0**
+Version: **1.1.2**
 
 ![Linux](https://github.com/ImLimiteds/GabHTTP/actions/workflows/linux.yml/badge.svg)
 ![Windows](https://github.com/ImLimiteds/GabHTTP/actions/workflows/windows.yml/badge.svg)

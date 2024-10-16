@@ -65,8 +65,8 @@ namespace GabHttp {
         Server(int port);
         ~Server();
         void Route(const std::string& method, const std::string& path, const std::function<void(Request&, Response&)>& handler, const std::map<std::string, std::string>& required_headers = {});
-        void start();
-        void stop();
+        void Start();
+        void Stop();
     };
 
 }
